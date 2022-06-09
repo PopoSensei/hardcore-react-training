@@ -4,6 +4,8 @@ import { DuckProspectType } from "../services/duck";
 import * as Yup from "yup";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { createRandomDuck } from "../services/random";
+import Button from "./Button";
+import Input from "./Input";
 
 const schema = Yup.object().shape({
   firstName: Yup.string()
@@ -42,18 +44,18 @@ const HireDuckForm: FC<Props> = ({ hireDuck }) => {
           <Form>
             <div>
               <label htmlFor="firstName">Etunimi</label>
-              <Field type="text" name="firstName" />
+              <Field type="text" name="firstName" as={Input} />
               <ErrorMessage name="firstName" />
             </div>
             <div>
               <label htmlFor="lastName">Sukunimi</label>
-              <Field type="text" name="lastName" />
+              <Field type="text" name="lastName" as={Input} />
               <ErrorMessage name="lastName" />
             </div>
             <div>
-              <button type="submit" disabled={!isValid}>
+              <Button type="submit" disabled={!isValid}>
                 palkkaa
-              </button>
+              </Button>
             </div>
           </Form>
         );

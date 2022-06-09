@@ -4,6 +4,8 @@ import { DuckType } from "../services/duck";
 import cx from "clsx";
 
 import { duckClass, femaleClass, maleClass } from "./duck.css";
+import Button from "./Button";
+import { Link } from "react-router-dom";
 
 type Props = {
   duck: DuckType;
@@ -20,18 +22,21 @@ const Duck: FC<Props> = ({ duck, fireDuck }) => {
     <li className={classes}>
       <div>
         <div>
-          <strong>{duck.lastName}</strong>, {duck.firstName} (
-          {duck.age.toFixed(2)} y.)
+          <Link to={`/duck/${duck.id}`}>
+            <strong>{duck.lastName}</strong>, {duck.firstName} (
+            {duck.age.toFixed(2)} y.)
+          </Link>
         </div>
 
         <div>
-          <button
+          <Button
+            disabled={duck.isBeingFired}
             onClick={() => {
               fireDuck(duck.id);
             }}
           >
             vapauta
-          </button>
+          </Button>
         </div>
       </div>
     </li>

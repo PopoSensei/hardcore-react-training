@@ -15,6 +15,7 @@ export type DuckType = {
   email: string;
   isAdmin: boolean;
   relatedToCEO: boolean;
+  isBeingFired?: boolean;
 };
 
 export const getDucks = async (): Promise<DuckType[]> => {

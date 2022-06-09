@@ -1,6 +1,7 @@
 import { FC, memo } from "react";
 import { DuckType } from "../services/duck";
 import Duck from "./Duck";
+import { ascend, sortWith, prop } from "ramda";
 
 type Props = {
   ducks: DuckType[];
@@ -9,6 +10,11 @@ type Props = {
   showMetadata?: boolean;
   // titleRenderer: ({ title }: { title: string }) => ReactElement;
 };
+
+const duckSort = sortWith<DuckType>([
+  ascend(prop("lastName")),
+  ascend(prop("firstName"))
+]);
 
 const DuckList: FC<Props> = ({
   ducks,
@@ -19,6 +25,9 @@ const DuckList: FC<Props> = ({
   // const TitleRenderer = titleRenderer;
 
   const avgAge = ducks.reduce((acc, duck) => acc + duck.age, 0) / ducks.length;
+
+  const sortedDucks = duckSort(ducks);
+
   return (
     <>
       {/* <TitleRenderer title={title} /> */}
@@ -30,7 +39,7 @@ const DuckList: FC<Props> = ({
         </p>
       )}
       <ul>
-        {ducks.map((duck) => {
+        {sortedDucks.map((duck) => {
           return <Duck fireDuck={fireDuck} key={duck.id} duck={duck} />;
         })}
       </ul>

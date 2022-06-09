@@ -1,122 +1,43 @@
-import {
-  FC,
-  ReactNode,
-  useEffect,
-  useState,
-  useCallback,
-  useMemo
-} from "react";
-import {
-  DuckType,
-  getDucks,
-  fireDuck as fireDuckServ,
-  hireDuck as hireDuckServ,
-  DuckProspectType
-} from "../services/duck";
-import { cleanse } from "../services/instance";
-import DuckList from "./DuckList";
-import HireDuckForm from "./HireDuckForm";
+import { FC, useEffect, useRef } from "react";
+import { Outlet } from "react-router";
+import { Spinner } from "theme-ui";
+import useStore from "../services/store";
+import { mainClass, spinnerClass } from "./App.css";
+import MediaPlayer from "./MediaPlayer";
 
-type Props = {
-  children: ReactNode;
-};
+const App: FC = () => {
+  const getDucks = useStore((state) => state.getDucks);
+  const isLoading = useStore((state) => state.loadingCounter > 0);
+  const isInitialized = useStore((state) => state.isInitialized);
 
-const onCleanse = async () => await cleanse();
+  const ref = useRef<HTMLMediaElement>(null);
+  console.log(ref, "ref");
 
-const App: FC = (props) => {
-  const [ducks, setDucks] = useState<DuckType[]>([]);
-  const [secondsElapsed, setSecondsElapsed] = useState<number>(0);
-
-  const fireDuck = useCallback(
-    async (id: string) => {
-      const fired = await fireDuckServ(id);
-      setDucks((ducks) => {
-        return ducks.filter((d) => d.id !== fired.id);
-      });
-    },
-    [setDucks]
-  );
-
-  const hireDuck = useCallback(
-    async (prospect: DuckProspectType) => {
-      const hired = await hireDuckServ(prospect);
-      setDucks((ducks) => {
-        return ducks.concat(hired);
-      });
-    },
-    [setDucks]
-  );
-
-  const isGood = (duck: DuckType) => {
-    if (duck.age >= 10) {
-      return false;
-    }
-    if (duck.gender === 1) {
-      return true;
-    }
-  };
-
-  const goodDucks = useMemo(() => ducks.filter(isGood), [ducks]);
-  const badDucks = useMemo(() => ducks.filter((d) => !isGood(d)), [ducks]);
-
-  useEffect(() => {
-    const i = setInterval(() => {
-      // Tila haetaan funkkarina, joten se on aina ajankohtainen
-      setSecondsElapsed((s) => s + 1);
-    }, 1000);
-    return () => {
-      clearInterval(i);
-    };
-  }, []);
-
-  // Hookkien säännöt
-  useEffect(() => {
-    console.log("Tyhjää kutsutaan joka kerta");
-  });
-
-  useEffect(() => {
-    console.log("Tämä suoritetaan aina kun Ankat muuttuu");
-  }, [ducks]);
+  const Component = isInitialized
+    ? Outlet
+    : () => <span>Hold yer horsies!</span>;
 
   useEffect(() => {
     // Is this the real life or is this just fantasy
-    getDucks().then((ducks) => {
-      console.log("Fetched da ducks");
-      setDucks(ducks);
-    });
-  }, []);
+    // TODO: works very wrong
+    getDucks();
+  }, [getDucks]);
 
   return (
-    <main>
-      <button
-        onClick={() => {
-          onCleanse;
-        }}
-      >
-        Reset Dux
-      </button>
+    <main className={mainClass}>
+      {isLoading && <Spinner className={spinnerClass} />}
       <h1>Duck Erp 1000000</h1>
 
-      <HireDuckForm hireDuck={hireDuck} />
+      <MediaPlayer ref={ref} />
+      <button
+        onClick={() => {
+          ref.current?.play();
+        }}
+      >
+        soita video
+      </button>
 
-      <h2>Etusivu</h2>
-
-      <p>
-        Sekunteja elämästä kulunut: <strong>{secondsElapsed}</strong>
-      </p>
-
-      <DuckList
-        ducks={badDucks}
-        fireDuck={fireDuck}
-        title="Pahat ankat"
-        showMetadata
-      />
-      <DuckList
-        ducks={goodDucks}
-        fireDuck={fireDuck}
-        // titleRenderer={({ title }) => <h2>{title}</h2>}
-        title="Hyvät ankat"
-      />
+      <Component />
     </main>
   );
 };
