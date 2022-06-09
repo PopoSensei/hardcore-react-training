@@ -8,7 +8,7 @@ const HotReloadTester: FC = () => {
       }}
     >
       I am the text that will change without reloading when you edit me and save
-      the file.
+      the file. Lol
     </span>
   );
 };
